@@ -12,12 +12,12 @@ jobs:
       ports:
         - 80
       volumes:
-        - my_docker_volume:/volume_mount
+        - ${{ github.workspace}}:/container
       options: --cpus 1
 
     steps:
-      # - name: running test
-      #   run: npm i
+      - name: checkout the repo
+        run: actions/checkout@v2
       - name: Check for dockerenv file
         run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
       
