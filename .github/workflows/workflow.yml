@@ -5,6 +5,18 @@ on: push
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    container:
+      image: node:latest
+      env:
+        NODE_ENV: development
+      ports:
+        - 80
+      volumes:
+        - my_docker_volume:/volume_mount
+      options: --cpus 1
+
     steps:
       - name: running test
         run: npm i
+      - name: Check for dockerenv file
+        run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
