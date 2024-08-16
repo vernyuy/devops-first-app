@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: checkout the repo
-        run: actions/checkout@v2
+        uses: actions/checkout@v2
       - name: Check for dockerenv file
         run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
       
