@@ -16,7 +16,7 @@ jobs:
       options: --cpus 1
 
     steps:
-      - name: running test
-        run: npm i
+      # - name: running test
+      #   run: npm i
       - name: Check for dockerenv file
         run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
