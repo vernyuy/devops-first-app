@@ -24,4 +24,4 @@ jobs:
       - name: Open the backend and Install dependencies
         run: cd container & npm i
       - name: Build the image
-        run: docker build -t my-node-app .
+        run: cd container & docker build -t my-node-app .
