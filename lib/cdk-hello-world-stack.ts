@@ -65,7 +65,7 @@ export class CdkHelloWorldStack extends cdk.Stack {
     // Define the Lambda function resource
     const helloWorldFunction = new lambda.Function(this, 'HelloWorldFunction', {
       runtime: lambda.Runtime.NODEJS_20_X, // Choose any supported Node.js runtime
-      code: lambda.Code.fromAsset('devops-first-app/lambda'), // Points to the lambda directory
+      code: lambda.Code.fromAsset('../lambda'), // Points to the lambda directory
       handler: 'hello.handler', // Points to the 'hello' file in the lambda directory
     });
 
