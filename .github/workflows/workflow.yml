@@ -79,7 +79,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20"
-      - name: Install Python dependencies and CDK
+      - name: Install the CDK Dependency
+        run: |
+          npm install -g aws-cdk
+      - name: Install other dependencies
         run: |
           npm install
       - name: Configure AWS credentials
