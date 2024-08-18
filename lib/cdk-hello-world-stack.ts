@@ -28,7 +28,7 @@ export class CdkHelloWorldStack extends cdk.Stack {
       cluster: cluster, // Required
       cpu: 256, // Default is 256
       serviceName: `${PREFIX}-service`,
-      loadBalancerName: `${PREFIX}-alb`,
+      loadBalancerName: `${PREFIX}-alb-eda`,
       desiredCount: 2, // Default is 1
       taskImageOptions: {
         image: ecs.ContainerImage.fromEcrRepository(ecrRepository), //.fromAsset("./container/"),    //.fromRegistry("amazon/amazon-ecs-sample"),
