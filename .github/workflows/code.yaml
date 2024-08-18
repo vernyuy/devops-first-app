@@ -18,18 +18,19 @@
 #     steps:
 #       - name: checkout the repo
 #         uses: actions/checkout@v2
+
 #       - name: Check for dockerenv file
 #         run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
       
 #       - name: Open the backend and Install dependencies
-#         run: cd container & npm i
+#         run: npm i
 
 #       - name: Configure AWS credentials
 #         uses: aws-actions/configure-aws-credentials@v1
 #         with:
 #           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
 #           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: ap-south-1
+#           aws-region: us-east-1
 
 #       - name: Login to Amazon ECR
 #         id: login-ecr
@@ -55,44 +56,63 @@
 
 
         
-#       - name: Build the image
-#         run: cd container & docker build -t my-node-app .
+#       # - name: Build the image
+#       #   run: cd container & docker build -t my-node-app .
 
-name: AWS Service CI/CD
+
+name: Test GitHub Actions
 
 on:
   push:
-    branches: 
-      - main
-  # pull_request:
-  #   branches: [main]
+    branches:
+        - code
 
 jobs:
-  build:
+  run-tests:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-      - name: Install the CDK Dependency
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Check for dockerenv file
         run: |
-          npm install -g aws-cdk
-      - name: Install other dependencies
-        run: |
-          npm install
+          if [ -f /.dockerenv ]; then
+            echo "Found dockerenv"
+          else
+            echo "No dockerenv"
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: tsc --project tsconfig.json
+
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "us-east-1"
-      - name: Deploy to AWS
-        run: cdk deploy CdkHelloWorldStack --require-approval=never
-      # - name: Destroy stack
-      #   run: cdk destroy --app="python3 ${PWD}/cdk/my_service/app.py" --force
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Get commit hash
+        id: get-commit-hash
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Get timestamp
+        id: get-timestamp
+        run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
+
+      - name: Build, tag, and push the image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          IMAGE_TAG: ${{ env.commit_hash }}-${{ env.timestamp }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
