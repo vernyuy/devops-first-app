@@ -39,7 +39,7 @@ export class CdkHelloWorldStack extends cdk.Stack {
         containerPort: 80
       },
       memoryLimitMiB: 512, // Default is 512
-      publicLoadBalancer: false // Default is true
+      publicLoadBalancer: true // Default is true
     });
 
 // Add Scalling
