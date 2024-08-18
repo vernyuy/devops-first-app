@@ -1,7 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as ecs from "aws-cdk-lib/aws-ecs";
 import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
@@ -63,20 +61,20 @@ export class CdkHelloWorldStack extends cdk.Stack {
 
 
     // Define the Lambda function resource
-    const helloWorldFunction = new lambda.Function(this, 'HelloWorldFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X, // Choose any supported Node.js runtime
-      code: lambda.Code.fromAsset('lambda'), // Points to the lambda directory
-      handler: 'hello.handler', // Points to the 'hello' file in the lambda directory
-    });
+    // const helloWorldFunction = new lambda.Function(this, 'HelloWorldFunction', {
+    //   runtime: lambda.Runtime.NODEJS_20_X, // Choose any supported Node.js runtime
+    //   code: lambda.Code.fromAsset('lambda'), // Points to the lambda directory
+    //   handler: 'hello.handler', // Points to the 'hello' file in the lambda directory
+    // });
 
-    const api = new apigateway.LambdaRestApi(this, 'HelloWorldApi', {
-      handler: helloWorldFunction,
-      proxy: false,
-    });
+    // const api = new apigateway.LambdaRestApi(this, 'HelloWorldApi', {
+    //   handler: helloWorldFunction,
+    //   proxy: false,
+    // });
 
     // Define the '/hello' resource with a GET method
-    const helloResource = api.root.addResource('hello');
-    helloResource.addMethod('GET');
+    // const helloResource = api.root.addResource('hello');
+    // helloResource.addMethod('GET');
   }
 }
 
