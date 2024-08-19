@@ -28,10 +28,10 @@ export class CdkHelloWorldStack extends cdk.Stack {
       cluster: cluster, // Required
       cpu: 256, // Default is 256
       serviceName: `${PREFIX}-service`,
-      loadBalancerName: `${PREFIX}-alb`,
+      loadBalancerName: `${PREFIX}-alb-eda`,
       desiredCount: 2, // Default is 1
       taskImageOptions: {
-        image: ecs.ContainerImage.fromEcrRepository(ecrRepository), //.fromAsset("./container/"),    //.fromRegistry("amazon/amazon-ecs-sample"),
+        image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'latest'), //.fromAsset("./container/"),    //.fromRegistry("amazon/amazon-ecs-sample"),
         environment: {
           ENV_VAR_1: "value1",
           ENV_VAR_2: "value2",
@@ -58,23 +58,6 @@ export class CdkHelloWorldStack extends cdk.Stack {
       methods: [apigw2.HttpMethod.GET],
       integration: new HttpAlbIntegration("AlbIntegration", service.listener)
     })
-
-
-    // Define the Lambda function resource
-    // const helloWorldFunction = new lambda.Function(this, 'HelloWorldFunction', {
-    //   runtime: lambda.Runtime.NODEJS_20_X, // Choose any supported Node.js runtime
-    //   code: lambda.Code.fromAsset('lambda'), // Points to the lambda directory
-    //   handler: 'hello.handler', // Points to the 'hello' file in the lambda directory
-    // });
-
-    // const api = new apigateway.LambdaRestApi(this, 'HelloWorldApi', {
-    //   handler: helloWorldFunction,
-    //   proxy: false,
-    // });
-
-    // Define the '/hello' resource with a GET method
-    // const helloResource = api.root.addResource('hello');
-    // helloResource.addMethod('GET');
   }
 }
 
@@ -85,7 +68,8 @@ export class RepositoryStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const repository = new ecr.Repository(this, "Repository", { repositoryName: `${PREFIX}-repository` });
+    const repository = new ecr.Repository(this, "Repository", { repositoryName: `${PREFIX}-repository`, 
+      removalPolicy: cdk.RemovalPolicy.DESTROY, });
     this.repository = repository;
   }
 }
