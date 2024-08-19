@@ -4,7 +4,7 @@ To integrate CICD (Devops) with AWS CDK in your nodeJs Typescript project, follo
 
 ### Step One : Clone the repository
 
-` git clone https://github.com/vernyuy/devops-first-app.git`
+` git clone https://github.com/EducloudHQ/devops-with-cdk.git`
 
 ### Step Two: Install the dependencies
 
