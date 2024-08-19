@@ -31,7 +31,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
       - name: Deploy to AWS
-        run: cdk deploy CdkHelloWorldStack
+        run: cdk deploy DevopsFirstAppStack
       
       - name: Retrieve ALB DNS name
         run: |
