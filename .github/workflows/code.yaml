@@ -34,7 +34,7 @@ jobs:
         run: cd container & npm install
 
       - name: Build the project
-        run: cd container & tsc --project tsconfig.json
+        run: cd container & npm run node:build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3

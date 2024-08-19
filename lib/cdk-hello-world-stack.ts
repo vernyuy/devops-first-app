@@ -31,7 +31,7 @@ export class CdkHelloWorldStack extends cdk.Stack {
       loadBalancerName: `${PREFIX}-alb-eda`,
       desiredCount: 2, // Default is 1
       taskImageOptions: {
-        image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'latest'), //.fromAsset("./container/"),    //.fromRegistry("amazon/amazon-ecs-sample"),
+        image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'latest'),
         environment: {
           ENV_VAR_1: "value1",
           ENV_VAR_2: "value2",
@@ -42,7 +42,7 @@ export class CdkHelloWorldStack extends cdk.Stack {
       publicLoadBalancer: true // Default is true
     });
 
-// Add Scalling
+    // Add Scalling
     const scaling = service.service.autoScaleTaskCount({ maxCapacity: 5, minCapacity: 1 });
     scaling.scaleOnCpuUtilization("CpuScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
     scaling.scaleOnMemoryUtilization("RamScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
