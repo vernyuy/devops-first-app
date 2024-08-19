@@ -31,7 +31,7 @@ export class CdkHelloWorldStack extends cdk.Stack {
       loadBalancerName: `${PREFIX}-alb-eda`,
       desiredCount: 2, // Default is 1
       taskImageOptions: {
-        image: ecs.ContainerImage.fromEcrRepository(ecrRepository), //.fromAsset("./container/"),    //.fromRegistry("amazon/amazon-ecs-sample"),
+        image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'latest'), //.fromAsset("./container/"),    //.fromRegistry("amazon/amazon-ecs-sample"),
         environment: {
           ENV_VAR_1: "value1",
           ENV_VAR_2: "value2",
