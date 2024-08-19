@@ -1,6 +1,4 @@
 import * as express from "express";
-import * as os from "os";
-
 const app = express();
 
 app.get("/", (request, response) => {

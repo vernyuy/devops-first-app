@@ -1,4 +1,4 @@
-name: Deploy Code with GitHub Actions
+name: Deploy the Nodejs App and Build the Image
 
 on:
   push:
@@ -25,16 +25,16 @@ jobs:
         run: ls
 
       - name: Install dependencies
-        run: cd container
+        run: cd nodejs-app
 
       - name: cont ddir
         run: ls
 
       - name: Install dependencies
-        run: cd container; npm install
+        run: cd nodejs-app; npm install
 
       - name: Build the project
-        run: cd container; npm run node:build
+        run: cd nodejs-app; npm run node:build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -61,7 +61,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
           IMAGE_TAG: ${{ env.commit_hash }}-${{ env.timestamp }}
         run: |
-          cd container
+          cd nodejs-app
           docker build -t my-ecr-repo .
           docker tag my-ecr-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest

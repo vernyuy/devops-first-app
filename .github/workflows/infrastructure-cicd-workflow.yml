@@ -1,9 +1,9 @@
-name: AWS Service CI/CD
+name: Deploy the infrastructure
 
 on:
   push:
     branches: 
-      - main
+      - infrastructure
 
 jobs:
   build:
@@ -34,9 +34,12 @@ jobs:
         run: cdk deploy CdkHelloWorldStack
       
       - name: Retrieve ALB DNS name
-        id: alb_dns
         run: |
-          alb_name="eda-ecs-alb-eda"
+          alb_name=${{ secrets.LOAD_BALANCER_NAME }}
           alb_dns=$(aws elbv2 describe-load-balancers --names $alb_name --query "LoadBalancers[0].DNSName" --output text)
           echo "ALB DNS: $alb_dns"
           echo "::set-output name=alb_dns::$alb_dns"
+
+      # - name: Destroy the cdk application
+      #   run: cdk destroy --all
+      
