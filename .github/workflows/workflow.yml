@@ -94,5 +94,15 @@ jobs:
           aws-region: "us-east-1"
       - name: Deploy to AWS
         run: cdk deploy CdkHelloWorldStack --require-approval=never
+      
+      - name: Retrieve ALB DNS name
+        id: alb_dns
+        run: |
+          alb_name="eda-ecs-alb-eda"
+          alb_dns=$(aws elbv2 describe-load-balancers --names $alb_name --query "LoadBalancers[0].DNSName" --output text)
+          echo "ALB DNS: $alb_dns"
+          echo "::set-output name=alb_dns::$alb_dns"
       # - name: Destroy stack
       #   run: cdk destroy CdkHelloWorldStack
+
+      # Get the alb dns url and eccho in github actions
