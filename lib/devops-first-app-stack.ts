@@ -17,7 +17,7 @@ export class DevopsFirstAppStack extends cdk.Stack {
     const servicesDir = path.join(__dirname, '../services');
 
     // Read the services directory to get a list of service names
-    const services = fs.readdirSync(servicesDir).filter(file => 
+    const services = fs.readdirSync(servicesDir).filter(file =>
       fs.statSync(path.join(servicesDir, file)).isDirectory()
     );
 
@@ -41,39 +41,39 @@ export class DevopsFirstAppStack extends cdk.Stack {
         removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
       });
 
-          // Create a load-balanced Fargate service and make it public
-    const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "EdaFargateService", {
-      cluster: cluster, // Required
-      cpu: 256, // can be >= 256
-      serviceName: `${PREFIX}-service`,
-      loadBalancerName: `${PREFIX}-alb-eda`,
-      desiredCount: 2, // Default is 1
-      taskImageOptions: {
-        image: ecs.ContainerImage.fromEcrRepository(ecrRepo, 'latest'),
-        environment: {
-          ENV_VAR_1: "value1",
-          ENV_VAR_2: "value2",
+      // Create a load-balanced Fargate service and make it public
+      const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "fargateService", {
+        cluster: cluster, // Required
+        cpu: 256, // can be >= 256
+        serviceName: `${PREFIX}-service`,
+        loadBalancerName: `${PREFIX}-alb-eda`,
+        desiredCount: 2, // Default is 1
+        taskImageOptions: {
+          image: ecs.ContainerImage.fromEcrRepository(ecrRepo, 'latest'),
+          environment: {
+            ENV_VAR_1: "value1",
+            ENV_VAR_2: "value2",
+          },
+          containerPort: 80
         },
-        containerPort: 80
-      },
-      memoryLimitMiB: 512, // can be >= 512
-      publicLoadBalancer: true // can be set to false
-    });
+        memoryLimitMiB: 512, // can be >= 512
+        publicLoadBalancer: true // can be set to false
+      });
 
-    // Add Scalling
-    const scaling = fargateService.service.autoScaleTaskCount({ maxCapacity: 5, minCapacity: 1 });
-    scaling.scaleOnCpuUtilization("CpuScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
-    scaling.scaleOnMemoryUtilization("RamScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
+      // Add Scalling
+      const scaling = fargateService.service.autoScaleTaskCount({ maxCapacity: 5, minCapacity: 1 });
+      scaling.scaleOnCpuUtilization("CpuScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
+      scaling.scaleOnMemoryUtilization("RamScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
 
-    fargateService.targetGroup.configureHealthCheck({
-      path: "/"
-    })
-    const httpApi = new apigw2.HttpApi(this, "HttpApi", { apiName: `${PREFIX}-api` });
-    httpApi.addRoutes({
-      path: "/",
-      methods: [apigw2.HttpMethod.GET],
-      integration: new HttpAlbIntegration("AlbIntegration", fargateService.listener)
-    })
+      fargateService.targetGroup.configureHealthCheck({
+        path: "/"
+      })
+      const httpApi = new apigw2.HttpApi(this, "HttpApi", { apiName: `${PREFIX}-api` });
+      httpApi.addRoutes({
+        path: "/",
+        methods: [apigw2.HttpMethod.GET],
+        integration: new HttpAlbIntegration("AlbIntegration", fargateService.listener)
+      })
     });
 
     // Create a load-balanced Fargate service and make it public
