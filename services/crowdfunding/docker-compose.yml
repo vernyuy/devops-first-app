@@ -1,0 +1,46 @@
+services:
+    # Web Server Service
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+            - "8080:80"
+        volumes:
+            - .:/var/www
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+        depends_on:
+            - app
+            - mysql.railway.internal
+
+    #Database Service
+    mysql.railway.internal:
+        image: mysql
+        container_name: mysql
+        volumes:
+            - ./mysql/data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: railway
+            MYSQL_ROOT_PASSWORD: GEdjRYyRBpETKcfXqdCIICPvxXugGISF
+
+    # Application Service
+    app:
+        container_name: laravel
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - .:/var/www
+        ports:
+            - "9000:9000"
+        working_dir: /var/www
+
+    #phpMyAdmin Service
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        ports:
+            - "3400:80"
+        depends_on:
+            - mysql.railway.internal

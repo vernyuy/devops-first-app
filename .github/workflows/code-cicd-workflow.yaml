@@ -24,17 +24,17 @@ jobs:
       - name: root dir
         run: ls
 
-      - name: Install dependencies
-        run: cd nodejs-app
+      # - name: Install dependencies
+      #   run: cd nodejs-app
 
-      - name: cont ddir
-        run: ls
+      # - name: cont ddir
+      #   run: ls
 
-      - name: Install dependencies
-        run: cd nodejs-app; npm install
+      # - name: Install dependencies
+      #   run: cd nodejs-app; npm install
 
-      - name: Build the project
-        run: cd nodejs-app; npm run node:build
+      # - name: Build the project
+      #   run: cd nodejs-app; npm run node:build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -47,24 +47,35 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get commit hash
-        id: get-commit-hash
-        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      # - name: Get commit hash
+      #   id: get-commit-hash
+      #   run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Get timestamp
-        id: get-timestamp
-        run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
+      # - name: Get timestamp
+      #   id: get-timestamp
+      #   run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
 
-      - name: Build, tag, and push the image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ env.commit_hash }}-${{ env.timestamp }}
+      # - name: Build, tag, and push the image to Amazon ECR
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+      #     IMAGE_TAG: ${{ env.commit_hash }}-${{ env.timestamp }}
+      #   run: |
+      #     cd nodejs-app
+      #     docker build -t my-ecr-repo .
+      #     docker tag my-ecr-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
+      #     docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
+
+      - name: Build and push Docker images
         run: |
-          cd nodejs-app
-          docker build -t my-ecr-repo .
-          docker tag my-ecr-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
+          for service in ./services/*/ ; do
+            service_name=$(basename "$service")
+            ecr_repo="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$service_name"
+            echo "Building Docker image for $service_name"
+            docker build -t "$ecr_repo:latest" "$service"
+            echo "Pushing Docker image to ECR for $service_name"
+            docker push "$ecr_repo:latest"
+          done
 
       - name: Force deployment
         run: |
