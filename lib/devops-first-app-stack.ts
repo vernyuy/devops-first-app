@@ -42,11 +42,11 @@ export class DevopsFirstAppStack extends cdk.Stack {
       });
 
       // Create a load-balanced Fargate service and make it public
-      const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "fargateService", {
+      const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${service}-fargateService`, {
         cluster: cluster, // Required
         cpu: 256, // can be >= 256
-        serviceName: `${PREFIX}-service`,
-        loadBalancerName: `${PREFIX}-alb-eda`,
+        serviceName: `${service}-service`,
+        loadBalancerName: `${service}-alb-eda`,
         desiredCount: 2, // Default is 1
         taskImageOptions: {
           image: ecs.ContainerImage.fromEcrRepository(ecrRepo, 'latest'),
@@ -68,11 +68,11 @@ export class DevopsFirstAppStack extends cdk.Stack {
       fargateService.targetGroup.configureHealthCheck({
         path: "/"
       })
-      const httpApi = new apigw2.HttpApi(this, "HttpApi", { apiName: `${PREFIX}-api` });
+      const httpApi = new apigw2.HttpApi(this, `${service}-HttpApi`, { apiName: `${PREFIX}-api` });
       httpApi.addRoutes({
         path: "/",
         methods: [apigw2.HttpMethod.GET],
-        integration: new HttpAlbIntegration("AlbIntegration", fargateService.listener)
+        integration: new HttpAlbIntegration(`${service}-AlbIntegration`, fargateService.listener)
       })
     });
 
