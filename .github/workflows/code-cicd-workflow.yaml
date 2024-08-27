@@ -33,9 +33,6 @@ jobs:
       - name: Deploy repoStackName to AWS
         run: cdk deploy repoStackName --require-approval=never
 
-      # - name: Deploy to AWS
-      #   run: cdk deploy DevopsAppStack --require-approval=never
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -78,39 +75,3 @@ jobs:
             echo "ALB DNS: $alb_dns"
             echo "::set-output name=alb_dns::$alb_dns"
           done
-      # - name: Install dependencies
-      #   run: cd nodejs-app
-
-      # - name: Install dependencies
-      #   run: cd nodejs-app; npm install
-
-      # - name: Build the project
-      #   run: cd nodejs-app; npm run node:build
-
-
-      # - name: Get commit hash
-      #   id: get-commit-hash
-      #   run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      # - name: Get timestamp
-      #   id: get-timestamp
-      #   run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
-
-      # - name: Build, tag, and push the image to Amazon ECR
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-      #     IMAGE_TAG: ${{ env.commit_hash }}-${{ env.timestamp }}
-      #   run: |
-      #     cd nodejs-app
-      #     docker build -t my-ecr-repo .
-      #     docker tag my-ecr-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
-      #     docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:latest
-
-
-
-      # - name: Force deployment
-      #   run: |
-      #     aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_SERVICE_NAME }} --force-new-deployment
-      #       # - name: Update cluster
-

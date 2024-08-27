@@ -2,7 +2,7 @@ import * as express from "express";
 const app = express();
 
 app.get("/", (request, response) => {
-  response.send(`This is the first service.`)
+  response.send(`Welcome to second micro-service`)
 })
 
 const PORT = 80
