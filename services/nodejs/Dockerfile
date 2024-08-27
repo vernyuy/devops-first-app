@@ -18,7 +18,7 @@ RUN npm install typescript
 RUN npx tsc --pretty
 
 # Copy transpiled files
-COPY ./build ./build
+# COPY ./build ./build
 
 EXPOSE 80
 
