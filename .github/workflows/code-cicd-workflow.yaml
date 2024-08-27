@@ -6,24 +6,12 @@ on:
         - code
 
 jobs:
-  run-tests:
+  run-cicd:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
-
-      # - name: Check for dockerenv file
-      #   run: |
-      #     if [ -f /.dockerenv ]; then
-      #       echo "Found dockerenv"
-      #     else
-      #       echo "No dockerenv"
-      #     fi
-
-      - name: root dir
-        run: ls
-
 
       - name: Set up Node
         uses: actions/setup-node@v3
@@ -41,11 +29,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
-      - name: Deploy to AWS
+
+      - name: Deploy repoStackName to AWS
         run: cdk deploy repoStackName --require-approval=never
 
-      - name: Deploy to AWS
-        run: cdk deploy DevopsAppStack --require-approval=never
+      # - name: Deploy to AWS
+      #   run: cdk deploy DevopsAppStack --require-approval=never
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -70,7 +59,7 @@ jobs:
           done
 
 
-      - name: Deploy to AWS
+      - name: Deploy DevopsAppStack to AWS
         run: cdk deploy DevopsAppStack --require-approval=never
 
       - name: Update Cluster to get the most recent image
