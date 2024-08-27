@@ -43,7 +43,7 @@ export class DevopsFirstAppStack extends cdk.Stack {
     });
 
     services.forEach(service => {
-        const serviceRepo = ecr.Repository.fromRepositoryName(this, `${service}Repository`, `${service}`)
+        const serviceRepo = ecr.Repository.fromRepositoryName(this, `${service}RepositoryService`, `${service}`)
 
       // Create a load-balanced Fargate service and make it public
       const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${service}-fargateService`, {
