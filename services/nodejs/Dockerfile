@@ -10,8 +10,15 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install --omit=dev
 
+# Copy the rest of the application code (including TypeScript files)
+COPY . .
+
+RUN npm install typescript
+# Compile TypeScript code (if needed)
+RUN npx tsc --pretty
+
 # Copy transpiled files
-# COPY ./build ./build
+COPY ./build ./build
 
 EXPOSE 80
 
