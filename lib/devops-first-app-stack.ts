@@ -49,7 +49,7 @@ export class DevopsFirstAppStack extends cdk.Stack {
       const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${services[0]}-fargateService`, {
         cluster: cluster, // Required
         cpu: 256, // can be >= 256
-        serviceName: `${services[0]}-service`,
+        serviceName: `${services[0]}`,
         loadBalancerName: `${services[0]}-alb-eda`,
         desiredCount: 2, // Default is 1
         taskImageOptions: {
