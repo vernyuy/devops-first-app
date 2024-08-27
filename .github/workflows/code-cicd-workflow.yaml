@@ -41,9 +41,8 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
-      # - name: Deploy to AWS
-      #   run: cdk deploy repoStackName --require-approval=never
-
+      - name: Deploy to AWS
+        run: cdk deploy repoStackName --require-approval=never
 
       - name: Deploy to AWS
         run: cdk deploy DevopsAppStack --require-approval=never
@@ -63,7 +62,32 @@ jobs:
         run: |
           for service in ./services/*/ ; do
             service_name=$(basename "$service")
+            ecr_repo="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$service_name"
+            echo "Building Docker image for $service_name"
+            docker build -t "$ecr_repo:latest" "$service"
+            echo "Pushing Docker image to ECR for $service_name"
+            docker push "$ecr_repo:latest"
+          done
+
+
+      - name: Deploy to AWS
+        run: cdk deploy DevopsAppStack --require-approval=never
+
+      - name: Update Cluster to get the most recent image
+        run: |
+          for service in ./services/*/ ; do
+            service_name=$(basename "$service")
             aws ecs update-service --cluster eda-ecs-cluster --service $service_name --force-new-deployment
+          done
+
+
+      - name: Retrieving the DNS for the services
+        run: |
+          for service in ./services/*/ ; do
+            alb_name=$(basename "$service")
+            alb_dns=$(aws elbv2 describe-load-balancers --names $alb_name --query "LoadBalancers[0].DNSName" --output text)
+            echo "ALB DNS: $alb_dns"
+            echo "::set-output name=alb_dns::$alb_dns"
           done
       # - name: Install dependencies
       #   run: cd nodejs-app
