@@ -30,7 +30,7 @@ export class DevopsFirstAppStack extends cdk.Stack {
       restrictDefaultSecurityGroup: false
     });
 
-    const cluster = new ecs.Cluster(this, "EdaCluster", {
+    const cluster = new ecs.Cluster(this, "MultiImageCluster", {
       vpc: vpc,
       clusterName: `${PREFIX}-cluster`
     });
