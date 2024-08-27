@@ -34,14 +34,7 @@ export class DevopsFirstAppStack extends cdk.Stack {
       vpc: vpc,
       clusterName: `${PREFIX}-cluster`
     });
-
-    // // services.forEach(service => {
-    //   new ecr.Repository(this, `${services[0]}Repository`, {
-    //     repositoryName: services[0].toLowerCase(), // ECR repository names must be lowercase
-    //     removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
-    //   });
-    // // });
-
+    
     services.forEach(service => {
         const serviceRepo = ecr.Repository.fromRepositoryName(this, `${service}-RepositoryService`, `${service}`)
 
@@ -80,40 +73,6 @@ export class DevopsFirstAppStack extends cdk.Stack {
         integration: new HttpAlbIntegration(`${service}-AlbIntegration`, fargateService.listener)
       })
     });
-
-    // Create a load-balanced Fargate service and make it public
-    // const service = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "EdaFargateService", {
-    //   cluster: cluster, // Required
-    //   cpu: 256, // can be >= 256
-    //   serviceName: `${PREFIX}-service`,
-    //   loadBalancerName: `${PREFIX}-alb-eda`,
-    //   desiredCount: 2, // Default is 1
-    //   taskImageOptions: {
-    //     image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'latest'),
-    //     environment: {
-    //       ENV_VAR_1: "value1",
-    //       ENV_VAR_2: "value2",
-    //     },
-    //     containerPort: 80
-    //   },
-    //   memoryLimitMiB: 512, // can be >= 512
-    //   publicLoadBalancer: true // can be set to false
-    // });
-
-    // // Add Scalling
-    // const scaling = service.service.autoScaleTaskCount({ maxCapacity: 5, minCapacity: 1 });
-    // scaling.scaleOnCpuUtilization("CpuScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
-    // scaling.scaleOnMemoryUtilization("RamScaling", { targetUtilizationPercent: 70 }); // default cooldown of 5 min
-
-    // service.targetGroup.configureHealthCheck({
-    //   path: "/"
-    // })
-    // const httpApi = new apigw2.HttpApi(this, "HttpApi", { apiName: `${PREFIX}-api` });
-    // httpApi.addRoutes({
-    //   path: "/",
-    //   methods: [apigw2.HttpMethod.GET],
-    //   integration: new HttpAlbIntegration("AlbIntegration", service.listener)
-    // })
   }
 }
 
@@ -138,11 +97,5 @@ export class RepositoryStack extends cdk.Stack {
         removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
       });
     });
-
-    // const repository = new ecr.Repository(this, "Repository", {
-    //   repositoryName: `${PREFIX}-repository`,
-    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
-    // });
-    // this.repository = repository;
   }
 }
