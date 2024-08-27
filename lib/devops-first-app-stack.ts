@@ -26,13 +26,13 @@ export class DevopsFirstAppStack extends cdk.Stack {
     const vpc = new ec2.Vpc(this, "EdaVpc", {
       ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
       maxAzs: 2, // Default is all AZs in region
-      vpcName: `${PREFIX}-vpc`,
+      vpcName: `${PREFIX}-mvpc`,
       restrictDefaultSecurityGroup: false
     });
 
     const cluster = new ecs.Cluster(this, "MultiImageCluster", {
       vpc: vpc,
-      clusterName: `${PREFIX}-cluster`
+      clusterName: `${PREFIX}-mcluster`
     });
 
     services.forEach(service => {
