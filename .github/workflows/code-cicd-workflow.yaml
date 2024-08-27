@@ -68,9 +68,6 @@ jobs:
       # - name: Install dependencies
       #   run: cd nodejs-app
 
-      # - name: cont ddir
-      #   run: ls
-
       # - name: Install dependencies
       #   run: cd nodejs-app; npm install
 
