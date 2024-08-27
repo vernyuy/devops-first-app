@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 # Copy transpiled files
-COPY ./build ./build
+# COPY ./build ./build
 
 EXPOSE 80
 
