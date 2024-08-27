@@ -32,15 +32,15 @@ export class DevopsFirstAppStack extends cdk.Stack {
 
     const cluster = new ecs.Cluster(this, "MultiImageCluster", {
       vpc: vpc,
-      clusterName: `${PREFIX}-mcluster`
+      clusterName: `${PREFIX}-cluster`
     });
 
-    // services.forEach(service => {
-      new ecr.Repository(this, `${services[0]}Repository`, {
-        repositoryName: services[0].toLowerCase(), // ECR repository names must be lowercase
-        removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
-      });
-    // });
+    // // services.forEach(service => {
+    //   new ecr.Repository(this, `${services[0]}Repository`, {
+    //     repositoryName: services[0].toLowerCase(), // ECR repository names must be lowercase
+    //     removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
+    //   });
+    // // });
 
     // services.forEach(service => {
         const serviceRepo = ecr.Repository.fromRepositoryName(this, `${services[0]}RepositoryService`, `${services[0]}`)
@@ -117,16 +117,32 @@ export class DevopsFirstAppStack extends cdk.Stack {
   }
 }
 
-// export class RepositoryStack extends cdk.Stack {
-//   repository: ecr.Repository;
+export class RepositoryStack extends cdk.Stack {
+  repository: ecr.Repository;
 
-//   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-//     super(scope, id, props);
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
 
-//     const repository = new ecr.Repository(this, "Repository", {
-//       repositoryName: `${PREFIX}-repository`,
-//       removalPolicy: cdk.RemovalPolicy.DESTROY,
-//     });
-//     this.repository = repository;
-//   }
-// }
+      // Define the path to the services directory
+      const servicesDir = path.join(__dirname, '../services');
+
+      // Read the services directory to get a list of service names
+      const services = fs.readdirSync(servicesDir).filter(file =>
+        fs.statSync(path.join(servicesDir, file)).isDirectory()
+      );
+  
+
+    services.forEach(service => {
+      new ecr.Repository(this, `${service}Repository`, {
+        repositoryName: service.toLowerCase(), // ECR repository names must be lowercase
+        removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
+      });
+    });
+
+    // const repository = new ecr.Repository(this, "Repository", {
+    //   repositoryName: `${PREFIX}-repository`,
+    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
+    // });
+    // this.repository = repository;
+  }
+}
