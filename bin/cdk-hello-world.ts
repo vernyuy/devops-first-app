@@ -4,5 +4,5 @@ import { DevopsFirstAppStack, RepositoryStack } from '../lib/devops-first-app-st
 
 const app = new cdk.App();
 
-const repoStack = new RepositoryStack(app, "repoStackName", {})
+const repoStack = new RepositoryStack(app, "repoStackNameTest", {})
 new DevopsFirstAppStack(app, 'DevopsAppStack',  {});

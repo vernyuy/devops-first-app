@@ -23,7 +23,7 @@ export class DevopsFirstAppStack extends cdk.Stack {
 
     // Loop through each service directory and create an ECR repository
 
-    const vpc = new ec2.Vpc(this, "EdaVpc", {
+    const vpc = new ec2.Vpc(this, "EdaVpcTest", {
       ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
       maxAzs: 2, // Default is all AZs in region
       vpcName: `${PREFIX}-mvpc`,
