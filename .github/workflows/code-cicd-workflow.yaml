@@ -21,6 +21,7 @@ jobs:
       - name: Install the CDK Dependency
         run: |
           npm install -g aws-cdk
+          npm install typescript
       - name: Install other dependencies
         run: |
           npm install
