@@ -57,7 +57,10 @@ jobs:
 
 
       - name: Deploy DevopsAppStack to AWS
-        run: cdk deploy DevopsAppStack --require-approval=never
+        run: |
+          cdk deploy DevopsAppStack \
+            --context env='[{"name": ${{ secrets.SERVICE_1_NAME }},"accountNumber": ${{ secrets.SERVICE_1_ACCOUNT_NUMBER }},"region": ${{ secrets.SERVICE_1_AWS_REGION }}},{"name": ${{ secrets.SERVICE_2_NAME }},"accountNumber": ${{ secrets.SERVICE_2_ACCOUNT_NUMBER }},"region": ${{ secrets.SERVICE_1_AWS_REGION }}}]' \
+            --require-approval never
 
       - name: Update Cluster to get the most recent image
         run: |

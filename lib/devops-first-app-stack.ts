@@ -12,6 +12,19 @@ export const PREFIX = "eda-ecs";
 export class DevopsFirstAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    
+    const envContext = this.node.tryGetContext('env')
+    if (envContext) {
+      try {
+        // Parse the context variable string into a JSON object
+        const envVar = JSON.parse(envContext);
+        console.log(envVar[0].region);  // Accessing the region of the first environment
+      } catch (error) {
+        console.error('Failed to parse context variable', error);
+      }
+    } else {
+      console.log('Context "env" is not set or is not an array.');
+    }
 
     // Define the path to the services directory
     const servicesDir = path.join(__dirname, '../services');
@@ -34,9 +47,9 @@ export class DevopsFirstAppStack extends cdk.Stack {
       vpc: vpc,
       clusterName: `${PREFIX}-cluster`
     });
-    
+
     services.forEach(service => {
-        const serviceRepo = ecr.Repository.fromRepositoryName(this, `${service}-RepositoryService`, `${service}`)
+      const serviceRepo = ecr.Repository.fromRepositoryName(this, `${service}-RepositoryService`, `${service}`)
 
       // Create a load-balanced Fargate service and make it public
       const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${service}-fargateService`, {
@@ -46,11 +59,11 @@ export class DevopsFirstAppStack extends cdk.Stack {
         loadBalancerName: `${service}`,
         desiredCount: 2, // Default is 1
         taskImageOptions: {
-              image: ecs.ContainerImage.fromEcrRepository(serviceRepo, 'latest'),
+          image: ecs.ContainerImage.fromEcrRepository(serviceRepo, 'latest'),
           // image: ecs.ContainerImage.fromEcrRepository(ecrRepo, 'latest'),
           environment: {
-            ENV_VAR_1: "value1",
-            ENV_VAR_2: "value2",
+            ENV_VAR_1: this.node.tryGetContext('envVar1'),
+            ENV_VAR_2: this.node.tryGetContext('envVar2'),
           },
           containerPort: 80
         },
@@ -82,14 +95,14 @@ export class RepositoryStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-      // Define the path to the services directory
-      const servicesDir = path.join(__dirname, '../services');
+    // Define the path to the services directory
+    const servicesDir = path.join(__dirname, '../services');
 
-      // Read the services directory to get a list of service names
-      const services = fs.readdirSync(servicesDir).filter(file =>
-        fs.statSync(path.join(servicesDir, file)).isDirectory()
-      );
-  
+    // Read the services directory to get a list of service names
+    const services = fs.readdirSync(servicesDir).filter(file =>
+      fs.statSync(path.join(servicesDir, file)).isDirectory()
+    );
+
 
     services.forEach(service => {
       new ecr.Repository(this, `${service}Repository`, {
