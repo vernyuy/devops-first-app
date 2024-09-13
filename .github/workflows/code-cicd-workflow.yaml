@@ -3,7 +3,7 @@ name: Deploy the Nodejs App and Build the Image
 on:
   push:
     branches:
-        - main
+        - env
 
 jobs:
   run-cicd:
