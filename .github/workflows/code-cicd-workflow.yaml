@@ -41,7 +41,7 @@ jobs:
 
       - name: Deploy DevopsAppStack to AWS
         run: |
-          CONTEXT='[{"region": "${{ services.SERVICE_1_AWS_REGION }}"}, {"region": "${{ services.SERVICE_2_AWS_REGION }}"}]'
+          CONTEXT='[{"region": "${{ env.SERVICE_1_AWS_REGION }}"}, {"region": "${{ env.SERVICE_2_AWS_REGION }}"}]'
           cdk deploy DevopsAppStack --context services="$CONTEXT" --require-approval never
 
       - name: Update Cluster to get the most recent image
