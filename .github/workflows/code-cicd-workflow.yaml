@@ -8,6 +8,7 @@ on:
 jobs:
   run-cicd:
     runs-on: ubuntu-latest
+    environment: services
 
     steps:
       - name: Checkout the repo
