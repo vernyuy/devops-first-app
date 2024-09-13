@@ -41,7 +41,7 @@ jobs:
 
       - name: Deploy DevopsAppStack to AWS
         run: |
-          CONTEXT='[{"region": "${{ env.AWS_REGION }}"}, {"region": "${{ env.SERVICE_2_AWS_REGION }}"}]'
+          CONTEXT='[{"region": "${{ vars.SERVICE_2_AWS_REGION }}"}, {"region": "${{ vars.SERVICE_2_AWS_REGION }}"}]'
           echo "CONTEXT: $CONTEXT"
           cdk deploy DevopsAppStack --context services="$CONTEXT" --require-approval never
 
