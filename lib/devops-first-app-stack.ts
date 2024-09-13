@@ -12,12 +12,12 @@ export const PREFIX = "eda-ecs";
 export class DevopsFirstAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    
-    const envContext = this.node.tryGetContext('env')
-    if (envContext) {
+
+    const servicesVariable = this.node.tryGetContext('services')
+    if (servicesVariable) {
       try {
         // Parse the context variable string into a JSON object
-        const envVar = JSON.parse(envContext);
+        const envVar = JSON.parse(servicesVariable);
         console.log(envVar[0].region);  // Accessing the region of the first environment
       } catch (error) {
         console.error('Failed to parse context variable', error);
