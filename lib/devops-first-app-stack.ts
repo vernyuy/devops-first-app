@@ -6,37 +6,13 @@ import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
 import * as apigw2 from "aws-cdk-lib/aws-apigatewayv2";
 import * as ecr from "aws-cdk-lib/aws-ecr"
 import { HttpAlbIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
-import * as fs from 'fs';
-import * as path from 'path';
+
 export const PREFIX = "eda-ecs";
 export class DevopsFirstAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const servicesVariable = this.node.tryGetContext('services')
-    if (servicesVariable) {
-      try {
-        // Parse the context variable string into a JSON object
-        const envVar = JSON.parse(servicesVariable);
-        console.log(envVar[0].region);  // Accessing the region of the first environment
-      } catch (error) {
-        console.error('Failed to parse context variable', error);
-      }
-    } else {
-      console.log('Context "env" is not set or is not an array.');
-    }
-
-    // Define the path to the services directory
-    const servicesDir = path.join(__dirname, '../services');
-
-    // Read the services directory to get a list of service names
-    const services = fs.readdirSync(servicesDir).filter(file =>
-      fs.statSync(path.join(servicesDir, file)).isDirectory()
-    );
-
-    // Loop through each service directory and create an ECR repository
-
-    const vpc = new ec2.Vpc(this, "EdaVpc", {
+    const vpc = new ec2.Vpc(this, "MyApp", {
       ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
       maxAzs: 2, // Default is all AZs in region
       vpcName: `${PREFIX}-mvpc`,
@@ -48,23 +24,17 @@ export class DevopsFirstAppStack extends cdk.Stack {
       clusterName: `${PREFIX}-cluster`
     });
 
-    services.forEach(service => {
-      const serviceRepo = ecr.Repository.fromRepositoryName(this, `${service}-RepositoryService`, `${service}`)
+      const ecrRepo = ecr.Repository.fromRepositoryName(this, `${PREFIX}-RepositoryService`, `${PREFIX}`)
 
       // Create a load-balanced Fargate service and make it public
-      const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${service}-fargateService`, {
+      const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${PREFIX}-fargateService`, {
         cluster: cluster, // Required
         cpu: 256, // can be >= 256
-        serviceName: `${service}`,
-        loadBalancerName: `${service}`,
+        serviceName: `${PREFIX}`,
+        loadBalancerName: `${PREFIX}`,
         desiredCount: 2, // Default is 1
         taskImageOptions: {
-          image: ecs.ContainerImage.fromEcrRepository(serviceRepo, 'latest'),
-          // image: ecs.ContainerImage.fromEcrRepository(ecrRepo, 'latest'),
-          environment: {
-            ENV_VAR_1: this.node.tryGetContext('envVar1'),
-            ENV_VAR_2: this.node.tryGetContext('envVar2'),
-          },
+          image: ecs.ContainerImage.fromEcrRepository(ecrRepo, 'latest'),
           containerPort: 80
         },
         memoryLimitMiB: 512, // can be >= 512
@@ -79,13 +49,12 @@ export class DevopsFirstAppStack extends cdk.Stack {
       fargateService.targetGroup.configureHealthCheck({
         path: "/"
       })
-      const httpApi = new apigw2.HttpApi(this, `${service}-HttpApi`, { apiName: `${PREFIX}-api` });
+      const httpApi = new apigw2.HttpApi(this, `${PREFIX}-HttpApi`, { apiName: `${PREFIX}-api` });
       httpApi.addRoutes({
         path: "/",
         methods: [apigw2.HttpMethod.GET],
-        integration: new HttpAlbIntegration(`${service}-AlbIntegration`, fargateService.listener)
+        integration: new HttpAlbIntegration(`${PREFIX}-AlbIntegration`, fargateService.listener)
       })
-    });
   }
 }
 
@@ -95,20 +64,9 @@ export class RepositoryStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Define the path to the services directory
-    const servicesDir = path.join(__dirname, '../services');
-
-    // Read the services directory to get a list of service names
-    const services = fs.readdirSync(servicesDir).filter(file =>
-      fs.statSync(path.join(servicesDir, file)).isDirectory()
-    );
-
-
-    services.forEach(service => {
-      new ecr.Repository(this, `${service}Repository`, {
-        repositoryName: service.toLowerCase(), // ECR repository names must be lowercase
+      new ecr.Repository(this, `${PREFIX}Repository`, {
+        repositoryName: 'myapp', // ECR repository names must be lowercase
         removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete the repo when the stack is deleted
       });
-    });
   }
 }
