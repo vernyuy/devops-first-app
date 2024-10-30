@@ -5,7 +5,7 @@ import { CdkHelloWorldStack, RepositoryStack } from '../lib/cdk-hello-world-stac
 
 const app = new cdk.App();
 
-const repoStack = new RepositoryStack(app, "repoStackName", {
+const repoStack = new RepositoryStack(app, "repoStack", {
   // env: { account, region },
 })
 new CdkHelloWorldStack(app, 'CdkHelloWorldStack', repoStack.repository, {
